@@ -5,20 +5,65 @@
 #ifndef main_h
 #define main_h
 
+#include <vector>
 using namespace std;
 
-/*class ATM {
+class ATM {
 private:
+	//need to initialize allCustomers
 	vector<Customer> allCustomers;
 	Person currentCustomer;
+	int findCustomer(int cardNumber){
+		//iterates through allCustomers comparing cardNumbers until it finds a match
+		for (int i = 0; i < allCustomers.size(); i++) {
+			if (allCustomers[i].compareCardNumber(cardNumber)){
+				return i;
+			}
+		}
+		
+		//returns -1 if no match is found
+		return -1;
+	}
 
 public:
 	bool addNewCustomer();
-	bool findCustomer(int cardNumber);
-	bool checkPIN(int PIN);
+	
+	//finish method below
+	bool setCurrentCustomer(int cardNumber){
+		//makes sure cardNumber is that of valid Customer
+		x = findCustomer(cardNumber);
+		if (x < 0) {
+			return false;
+		}
+		cout << "Please enter your PIN";
+		int PIN;
+		
+		//need guards for cin
+		cin >> PIN;
+		//add possible loops for missed trys
+		//checks that user knows PIN for cardNumber
+		if (allCustomers[x].comparePIN(PIN)){
+			currentCustomer = allCustomers[x];
+			return true;
+		}
+		
+		return false;
+	}
+
+	Customer getCustomer(int cardNumber){
+		x = findCustomer(cardNumber);	
+		
+		//if x is within the size of allCustomers returns the customer at that location
+		if (x > -1) {
+			return allCustomers[x];
+		}
+		
+		//otherwise returns nullptr reference (NULL)
+		return nullptr;
+	}
 
 };
-*/
+
 
 
 class Customer {
@@ -49,6 +94,8 @@ public:
 			cin >> enteredPIN;
 			if (comparePIN(enteredPIN)) {
 				
+				//cin needs a guard against invalid input
+				
 				//accepts 2 user inputed PIN's to make sure new PIN is desired PIN
 				cout << "Please enter new PIN: ";
 				cin >> enteredPIN;
@@ -61,6 +108,8 @@ public:
 					this->PIN = newPIN;
 					return true;
 				}
+				
+				//possibly add a loop
 				else {
 					cout << "Entered PINS do not match. Please try again";
 					
@@ -106,7 +155,20 @@ public:
 		return this->balance;
 	}
 
-	bool transfer(int cardNumber, double x);
+	bool transfer(int cardNumber, double x, ATM atm){		
+		
+		Customer transferTo = atm.getCustomer(cardNumber);
+			
+		//attempts to make withdrawal, if there are sufficient funds, makes deposit in other account, returns true
+		if (makeWithdrawal(x) && transferTo != nullptr){
+			transferTo.makeDeposit(x);
+			return true;
+		}
+		
+		//customer is unable to transfer the funds, returns false
+		cout << "Unable to transfer funds." << endl;
+		return false;
+	}
 };
 
 #endif /* main_h */
